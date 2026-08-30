@@ -40,6 +40,30 @@ jobs:
 
       - name: Fix Android theme
         run: |
+          FILE="source/MobileDatenManager/app/src/main/AndroidManifest.xml"
+          sed -i 's#@android:style/Theme.DeviceDefault.DayNight.NoActionBar#@android:style/Theme.Material.Light.NoActionBar#g' "$FILE"
+          echo "Theme nach Korrektur:"
+          grep -n 'android:theme' "$FILE"
+          if grep -q 'Theme.DeviceDefault.DayNight.NoActionBar' "$FILE"; then
+            echo "FEHLER: Theme wurde nicht ersetzt"
+            exit 1
+          fi
+
+      - name: Build APK
+        working-directory: source/MobileDatenManager
+        run: gradle --no-daemon clean :app:assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MobileDatenManager-APK
+          path: source/MobileDatenManager/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+      - name: Unpack source
+        run: unzip -q MobileDatenManager_V1_Source.zip -d source
+
+      - name: Fix Android theme
+        run: |
           sed -i 's/Theme.DeviceDefault.DayNight.NoActionBar/Theme.DeviceDefault.NoActionBar/g' source/MobileDatenManager/app/src/main/AndroidManifest.xml
 
       - name: Build APK
