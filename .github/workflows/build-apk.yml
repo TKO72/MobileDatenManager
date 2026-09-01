@@ -1,7 +1,13 @@
-name: Build MobileDatenManager APK
+name: Build MobileDatenManager V4.1 DIRECT TEST APK
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'MobileDatenManager_V4_1_DIRECT_TEST_Source.zip'
+      - '.github/workflows/build-apk.yml'
 
 permissions:
   contents: read
@@ -26,7 +32,7 @@ jobs:
       - name: Install Android SDK
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
 
-      - name: Gradle
+      - name: Gradle 9.5
         uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '9.5.0'
@@ -35,39 +41,7 @@ jobs:
         run: |
           rm -rf source
           mkdir source
-          unzip -q MobileDatenManager_V1_Source.zip -d source
-
-      - name: Replace Manifest
-        run: |
-          cat > source/MobileDatenManager/app/src/main/AndroidManifest.xml <<'EOF'
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
-              <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
-              <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
-
-              <application
-                  android:allowBackup="false"
-                  android:label="Mobile Daten Manager"
-                  android:supportsRtl="true">
-
-                  <activity
-                      android:name=".MainActivity"
-                      android:exported="true">
-
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-
-                  </activity>
-
-              </application>
-
-          </manifest>
-          EOF
-
-          echo "===== MANIFEST ====="
-          cat source/MobileDatenManager/app/src/main/AndroidManifest.xml
+          unzip -oq MobileDatenManager_V4_1_DIRECT_TEST_Source.zip -d source
 
       - name: Build APK
         working-directory: source/MobileDatenManager
@@ -76,19 +50,6 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MobileDatenManager-APK
-          path: source/MobileDatenManager/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-      - name: Unpack source
-        run: unzip -q MobileDatenManager_V1_Source.zip -d source
-
-      - name: Build APK
-        working-directory: source/MobileDatenManager
-        run: gradle --no-daemon :app:assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: MobileDatenManager-APK
+          name: MobileDatenManager-V4.1-DIRECT-TEST-APK
           path: source/MobileDatenManager/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
