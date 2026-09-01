@@ -1,4 +1,4 @@
-name: Build MobileDatenManager V4 APK
+name: Build MobileDatenManager V4.1 DIRECT TEST APK
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'MobileDatenManager_V4_SamsungFirewall_Source.zip'
+      - 'MobileDatenManager_V4_1_DIRECT_TEST_Source.zip'
       - '.github/workflows/build-apk.yml'
 
 permissions:
@@ -41,18 +41,15 @@ jobs:
         run: |
           rm -rf source
           mkdir source
-          unzip -oq MobileDatenManager_V4_SamsungFirewall_Source.zip -d source
+          unzip -oq MobileDatenManager_V4_1_DIRECT_TEST_Source.zip -d source
 
       - name: Build APK
         working-directory: source/MobileDatenManager
-        run: |
-          sed -i '/import androidx\.annotation\.Keep;/d' app/src/main/java/de/mobilepreferred/manager/PrivilegedService.java
-          sed -i '/^[[:space:]]*@Keep[[:space:]]*$/d' app/src/main/java/de/mobilepreferred/manager/PrivilegedService.java
-          gradle --no-daemon clean :app:assembleDebug
+        run: gradle --no-daemon clean :app:assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MobileDatenManager-V4-APK
+          name: MobileDatenManager-V4.1-DIRECT-TEST-APK
           path: source/MobileDatenManager/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
